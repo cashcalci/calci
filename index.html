@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculator</title>
+<title>CALCULATOR</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-body{font-family:Poppins;background:linear-gradient(135deg,#5f9cff,#7f53ff);margin:0;padding:14px}
-.card{max-width:520px;margin:auto;background:#fff;padding:18px;border-radius:22px;box-shadow:0 15px 40px rgba(0,0,0,.18)}
-h1{text-align:center;margin:4px 0 6px;font-size:26px}
+body{font-family:Poppins;margin:0;padding:16px;background:linear-gradient(140deg,#d7e9ff,#e9ddff,#d7f4ff)}
+.card{max-width:520px;margin:auto;background:#fff;padding:18px;border-radius:22px;box-shadow:0 15px 40px rgba(0,0,0,.18);border:1px solid #e6ecff}
+h1{text-align:center;margin:4px 0 6px;font-size:28px;color:#4b5cff}
 .time{text-align:center;color:#666;font-size:13px;margin-bottom:10px}
 .section{background:#f7f9ff;padding:12px;border-radius:14px;margin-top:12px}
-.sectionTitle{font-weight:600;margin-bottom:8px}
+.sectionTitle{font-weight:600;margin-bottom:8px;color:#4b5cff}
 .fieldRow{display:grid;grid-template-columns:2fr 1fr;gap:8px}
 input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #dcdcdc;font-size:15px}
 .inline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center}
-.valueBox{font-weight:600;text-align:center}
-button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;background:linear-gradient(90deg,#5f9cff,#7f53ff);color:white;font-size:17px;font-weight:600}
+.valueBox{font-weight:600;text-align:center;font-size:16px;color:#222}
+button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;background:linear-gradient(90deg,#4facfe,#7f53ff);color:white;font-size:17px;font-weight:600}
 .result{margin-top:12px;padding:14px;border-radius:14px;background:#eef1ff;text-align:center;font-size:18px;font-weight:600}
 .error{color:red;text-align:center;margin-top:8px;font-weight:600}
 @media(max-width:480px){.inline{grid-template-columns:1fr}.fieldRow{grid-template-columns:1fr}}
@@ -30,7 +30,7 @@ button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;ba
 <div class="time" id="datetime"></div>
 
 <div class="section">
-<div class="sectionTitle">1 USDT Live Conversion (Google Rate)</div>
+<div class="sectionTitle">1 USDT (Google Rate)</div>
 <div class="inline">
 <input value="1" disabled>
 <select id="usdtCurrency" onchange="convertUSDT()"></select>
@@ -54,7 +54,7 @@ button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;ba
 
 <label>Amount Sent</label>
 <div class="fieldRow">
-<input id="sent" type="number" placeholder="Enter amount">
+<input id="sent" type="number" placeholder="Enter amount sent">
 <select id="sentCurrency"></select>
 </div>
 </div>
@@ -62,6 +62,7 @@ button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;ba
 <button onclick="calculate()">Calculate</button>
 <div class="error" id="error"></div>
 <div class="result" id="result">Amount received in USD will appear here</div>
+
 <div class="actionRow">
 <button onclick="takeScreenshot()">📸 Screenshot</button>
 <button onclick="shareData()">📤 Share</button>
@@ -70,57 +71,19 @@ button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;ba
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-function updateTime(){
-  const now=new Date();
-  const dd=String(now.getDate()).padStart(2,'0');
-  const mm=String(now.getMonth()+1).padStart(2,'0');
-  const yyyy=now.getFullYear();
-  const time=now.toLocaleTimeString();
-  document.getElementById("datetime").innerText=`${dd}/${mm}/${yyyy} ${time}`;
-}
-setInterval(updateTime,1000);updateTime();
+function updateTime(){const now=new Date();const dd=String(now.getDate()).padStart(2,'0');const mm=String(now.getMonth()+1).padStart(2,'0');const yyyy=now.getFullYear();const time=now.toLocaleTimeString();document.getElementById("datetime").innerText=`${dd}/${mm}/${yyyy} ${time}`;}setInterval(updateTime,1000);updateTime();
 
-let rates={};
-async function loadRates(){
-  let res=await fetch("https://open.er-api.com/v6/latest/USD");
-  let data=await res.json();
-  rates=data.rates; populateCurrencies();
-}
+let rates={};async function loadRates(){let res=await fetch("https://open.er-api.com/v6/latest/USD");let data=await res.json();rates=data.rates;populateCurrencies();}
 let currencies=["USD","INR","EUR","AED","GBP","SGD"];
-function populateCurrencies(){
-  ["priceCurrency","commissionCurrency","sentCurrency","usdtCurrency"].forEach(id=>{
-    let sel=document.getElementById(id);
-    currencies.forEach(cur=>{
-      let opt=document.createElement("option");
-      opt.value=cur; opt.text=cur; sel.appendChild(opt);
-    });
-  });
-  convertUSDT();
-}
-function toUSD(amount,currency){ if(currency==="USD") return amount; return amount / rates[currency]; }
-function convertUSDT(){ let cur=document.getElementById("usdtCurrency").value; if(!cur||!rates[cur])return; document.getElementById("usdtValue").innerText=(1*rates[cur]).toFixed(2)+" "+cur; }
+function populateCurrencies(){["priceCurrency","commissionCurrency","sentCurrency","usdtCurrency"].forEach(id=>{let sel=document.getElementById(id);currencies.forEach(cur=>{let opt=document.createElement("option");opt.value=cur;opt.text=cur;sel.appendChild(opt);});});convertUSDT();}
+function toUSD(amount,currency){if(currency==="USD")return amount;return amount/rates[currency];}
+function convertUSDT(){let cur=document.getElementById("usdtCurrency").value;if(!cur||!rates[cur])return;document.getElementById("usdtValue").innerText=(1*rates[cur]).toFixed(2)+" "+cur;}
 
-function calculate(){
-  document.getElementById('error').innerText="";
-  let price=document.getElementById('price').value;
-  let commission=document.getElementById('commission').value;
-  let sent=document.getElementById('sent').value;
-  if(price===""||commission===""||sent===""){ document.getElementById('error').innerText="⚠️ Please fill all fields"; return; }
-  let priceUSD=toUSD(parseFloat(price),document.getElementById('priceCurrency').value);
-  let commissionUSD=toUSD(parseFloat(commission),document.getElementById('commissionCurrency').value);
-  let sentUSD=toUSD(parseFloat(sent),document.getElementById('sentCurrency').value);
-  let receivedUSD=sentUSD/(priceUSD+commissionUSD);
-  document.getElementById('result').innerHTML="Amount Received: $"+receivedUSD.toFixed(6)+" USD";
-}
+function calculate(){document.getElementById('error').innerText="";let price=document.getElementById('price').value;let commission=document.getElementById('commission').value;let sent=document.getElementById('sent').value;if(price===""||commission===""||sent===""){document.getElementById('error').innerText="⚠️ All fields must be filled";return;}let priceUSD=toUSD(parseFloat(price),document.getElementById('priceCurrency').value);let commissionUSD=toUSD(parseFloat(commission),document.getElementById('commissionCurrency').value);let sentUSD=toUSD(parseFloat(sent),document.getElementById('sentCurrency').value);let receivedUSD=sentUSD/(priceUSD+commissionUSD);document.getElementById('result').innerHTML="Amount Received: $"+receivedUSD.toFixed(6)+" USD";}
 loadRates();
 
-function takeScreenshot(){ html2canvas(document.querySelector('#card')).then(canvas=>{ let link=document.createElement('a'); link.download='calculator.png'; link.href=canvas.toDataURL(); link.click(); }); }
-
-async function shareData(){
-  let text=document.getElementById('result').innerText || "Calculator result";
-  try{ if(window.isSecureContext && navigator.share){ await navigator.share({title:'Calculator Result',text:text}); return;} throw new Error(); }
-  catch{ try{ await navigator.clipboard.writeText(text); alert("Result copied to clipboard"); }catch{ alert("Sharing not supported"); }}
-}
+function takeScreenshot(){html2canvas(document.querySelector('#card')).then(canvas=>{let link=document.createElement('a');link.download='calculator.png';link.href=canvas.toDataURL();link.click();});}
+async function shareData(){let text=document.getElementById('result').innerText;try{if(window.isSecureContext&&navigator.share){await navigator.share({title:'Calculator Result',text:text});return;}throw new Error();}catch{try{await navigator.clipboard.writeText(text);alert("Result copied to clipboard");}catch{alert("Sharing not supported");}}}
 </script>
 </body>
 </html>
