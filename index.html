@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-body{font-family:Poppins;margin:0;padding:16px;background:linear-gradient(140deg,#d7e9ff,#e9ddff,#d7f4ff)}
+body{font-family:Poppins;margin:0;padding:16px;background:linear-gradient(140deg,#cfe8ff,#e8e1ff,#d9f6ff)}
 .card{max-width:520px;margin:auto;background:#fff;padding:18px;border-radius:22px;box-shadow:0 15px 40px rgba(0,0,0,.18);border:1px solid #e6ecff}
-h1{text-align:center;margin:4px 0 6px;font-size:28px;color:#4b5cff}
+h1{text-align:center;margin:4px 0 6px;font-size:30px;color:#4b5cff}
 .time{text-align:center;color:#666;font-size:13px;margin-bottom:10px}
 .section{background:#f7f9ff;padding:12px;border-radius:14px;margin-top:12px}
 .sectionTitle{font-weight:600;margin-bottom:8px;color:#4b5cff}
@@ -27,7 +27,7 @@ button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;ba
 <body>
 <div class="card" id="card">
 <h1>CALCULATOR</h1>
-<div class="time" id="datetime"></div>
+<div class="time" id="datetime">Loading time...</div>
 
 <div class="section">
 <div class="sectionTitle">1 USDT (Google Rate)</div>
@@ -45,13 +45,11 @@ button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;ba
 <input id="price" type="number" placeholder="Enter price">
 <select id="priceCurrency"></select>
 </div>
-
 <label>Commission</label>
 <div class="fieldRow">
 <input id="commission" type="number" placeholder="Enter commission">
 <select id="commissionCurrency"></select>
 </div>
-
 <label>Amount Sent</label>
 <div class="fieldRow">
 <input id="sent" type="number" placeholder="Enter amount sent">
@@ -71,7 +69,19 @@ button{width:100%;padding:15px;margin-top:14px;border:none;border-radius:16px;ba
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-function updateTime(){const now=new Date();const dd=String(now.getDate()).padStart(2,'0');const mm=String(now.getMonth()+1).padStart(2,'0');const yyyy=now.getFullYear();const time=now.toLocaleTimeString();document.getElementById("datetime").innerText=`${dd}/${mm}/${yyyy} ${time}`;}setInterval(updateTime,1000);updateTime();
+// TIME + COUNTRY FROM IP
+async function loadDateTime(){
+ try{
+   let res=await fetch('https://ipapi.co/json/');
+   let data=await res.json();
+   const now=new Date().toLocaleString('en-GB',{timeZone:data.timezone});
+   document.getElementById('datetime').innerText=`${now} • ${data.country_name}`;
+ }catch{
+   const now=new Date().toLocaleString('en-GB');
+   document.getElementById('datetime').innerText=now;
+ }
+}
+loadDateTime();setInterval(loadDateTime,60000);
 
 let rates={};async function loadRates(){let res=await fetch("https://open.er-api.com/v6/latest/USD");let data=await res.json();rates=data.rates;populateCurrencies();}
 let currencies=["USD","INR","EUR","AED","GBP","SGD"];
